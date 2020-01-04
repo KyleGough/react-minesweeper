@@ -12,6 +12,8 @@ code {
     monospace;
 }
 
+/*-----------------------------------------------------------------------------------*/
+
 .m0 {
   margin: 0;
 }
@@ -19,6 +21,8 @@ code {
 .p0 {
   padding: 0;
 }
+
+/*-----------------------------------------------------------------------------------*/
 
 .cell {
   padding: 0.25em;
@@ -44,6 +48,7 @@ code {
 
 .cell-show:hover {
   background-color: #81B6E9;
+  color: #81B6E9;
 }
 
 .cell-hide {
@@ -58,6 +63,32 @@ code {
 
 .cell-hide:hover {
   background-color: #EEEEEE;
+  color: #EEEEEE;
 }
 
+.cell-0 { color: #91C6F9 }
+.cell-1 { color: #014668!important; }
+.cell-2 { color: #9527A3!important; }
+.cell-3 { color: #A3276D!important; }
+.cell-4 { color: #A32738!important; }
+.cell-5 { color: #EB0000!important; }
+.cell-6 { color: #C4471A!important; }
+.cell-7 { color: #C4751A!important; }
+.cell-8 { color: #C4AB1A!important; }
 
+/*-----------------------------------------------------------------------------------*/
+
+.stats {
+  font-size: 9px;
+}
+
+.stats span {
+  margin: 0 10px 0 10px;
+}
+
+.btn-reset {
+  line-height: 20px!important;
+  font-size: 8px!important;
+  padding: 0!important;
+  margin: 1em!important;
+}
