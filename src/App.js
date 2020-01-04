@@ -10,14 +10,13 @@ import 'materialize-css/dist/css/materialize.min.css';
 // Difficulty.
 // Flood fill.
 // First move.
-// End game detection.
+// Win detection.
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <Board />
-      </header>
+      <header className="App-header">React Minesweeper</header>
+      <Board />
     </div>
   );
 }
@@ -26,20 +25,20 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
 
-    const p = 0.3;
-    const w = 10;
-    const h = 10;
+    const p = 0.2;
+    const w = 18;
+    const h = 18;
     const board = this.newBoard(p, w, h);
     const mines = this.countMines(board, w,h);
 
     // Reference array.
     this.refBoard = []
-    for (let i = 0; i < w; i++) {
+    for (let j = 0; j < h; j++) {
       let row = [];
-      for (let j = 0; j < h; j++) {
-        row[j] = React.createRef();
+      for (let i = 0; i < w; i++) {
+        row[i] = React.createRef();
       }
-      this.refBoard[i] = row;
+      this.refBoard[j] = row;
     }
 
     this.state = {
@@ -47,18 +46,20 @@ class Board extends React.Component {
       height: h,
       board: board,
       mines: mines,
+      flags: 0,
       uncovered: 0,
+      show: false,
     }
   }
 
   getRefBoard(w, h) {
     let refBoard = []
-    for (let i = 0; i < w; i++) {
+    for (let j = 0; j < h; j++) {
       let row = [];
-      for (let j = 0; j < h; j++) {
-        row[j] = React.createRef();
+      for (let i = 0; i < w; i++) {
+        row[i] = React.createRef();
       }
-      refBoard[i] = row;
+      refBoard[j] = row;
     }
     return refBoard;
   }
@@ -66,12 +67,12 @@ class Board extends React.Component {
   // Board Initialisation.
   newBoard(p, w, h) {
     let board = [];
-    for (let i = 0; i < w; i++) {
+    for (let j = 0; j < h; j++) {
       let row = [];
-      for (let j = 0; j < h; j++) {
-        row[j] = (Math.random() <= p) ? 1 : 0;
+      for (let i = 0; i < w; i++) {
+        row[i] = (Math.random() <= p) ? 1 : 0;
       }
-      board[i] = row;
+      board[j] = row;
     }
     return board;
   }
@@ -87,9 +88,9 @@ class Board extends React.Component {
   }
 
   resetBoard() {
-    const board = this.newBoard(0.3, this.state.width, this.state.height);
+    const board = this.newBoard(0.2, this.state.width, this.state.height);
     const mines = this.countMines(board, this.state.width, this.state.height);
-    this.setState({board: board, mines: mines, uncovered: 0});
+    this.setState({board: board, mines: mines, uncovered: 0, show: false});
     for (let i = 0; i < this.state.width; i++) {
       for (let j = 0; j < this.state.height; j++) {
         this.refBoard[j][i].current.hideCell();
@@ -97,27 +98,69 @@ class Board extends React.Component {
     }
   }
 
+  showBoard() {
+    if (!this.state.show) {
+      this.setState({show: true});
+      for (let i = 0; i < this.state.width; i++) {
+        for (let j = 0; j < this.state.height; j++) {
+          this.refBoard[j][i].current.cellClick(true);
+        }
+      }      
+    }
+  }
+
   uncoverCell() {
     this.setState(prev => ({uncovered: prev.uncovered + 1}));
   }
 
-  renderCell(i, y, x) {
-    return <Cell ref={this.refBoard[y][x]} value={i} x={x} y={y} hidden={true} board={this.state.board} uncover={this.uncoverCell.bind(this)}/>
+  addFlag() {
+    console.log("add");
+    this.setState(prev => ({flags: prev.flags + 1}));
   }
 
-  renderRow(i) {  
+  removeFlag() {
+    console.log("remove");
+    this.setState(prev => ({flags: prev.flags - 1}));
+  }
+
+  renderCell(i, y, x) {
+    return (
+      <Cell
+        ref={this.refBoard[y][x]}
+        value={i}
+        x={x}
+        y={y}
+        hidden={true}
+        board={this.state.board}
+        uncover={this.uncoverCell.bind(this)}
+        showBoard={this.showBoard.bind(this)}
+        addFlag={this.addFlag.bind(this)}
+        removeFlag={this.removeFlag.bind(this)}
+      />
+    );
+  }
+
+  renderRow(j) {  
     return (
       <div className="board-row">
-        {this.renderCell(this.state.board[i][0], i, 0)}
-        {this.renderCell(this.state.board[i][1], i, 1)}
-        {this.renderCell(this.state.board[i][2], i, 2)}
-        {this.renderCell(this.state.board[i][3], i, 3)}
-        {this.renderCell(this.state.board[i][4], i, 4)}
-        {this.renderCell(this.state.board[i][5], i, 5)}
-        {this.renderCell(this.state.board[i][6], i, 6)}
-        {this.renderCell(this.state.board[i][7], i, 7)}
-        {this.renderCell(this.state.board[i][8], i, 8)}
-        {this.renderCell(this.state.board[i][9], i, 9)}
+        {this.renderCell(this.state.board[j][0], j, 0)}
+        {this.renderCell(this.state.board[j][1], j, 1)}
+        {this.renderCell(this.state.board[j][2], j, 2)}
+        {this.renderCell(this.state.board[j][3], j, 3)}
+        {this.renderCell(this.state.board[j][4], j, 4)}
+        {this.renderCell(this.state.board[j][5], j, 5)}
+        {this.renderCell(this.state.board[j][6], j, 6)}
+        {this.renderCell(this.state.board[j][7], j, 7)}
+        {this.renderCell(this.state.board[j][8], j, 8)}
+        {this.renderCell(this.state.board[j][9], j, 9)}
+        {this.renderCell(this.state.board[j][10], j, 10)}
+        {this.renderCell(this.state.board[j][11], j, 11)}
+        {this.renderCell(this.state.board[j][12], j, 12)}
+        {this.renderCell(this.state.board[j][13], j, 13)}
+        {this.renderCell(this.state.board[j][14], j, 14)}
+        {this.renderCell(this.state.board[j][15], j, 15)}
+        {this.renderCell(this.state.board[j][16], j, 16)}
+        {this.renderCell(this.state.board[j][17], j, 17)}
       </div>
     )
   }
@@ -130,8 +173,8 @@ class Board extends React.Component {
       <div>
         <div className="status">{status}</div>
         <div className="stats">
-          <span className="stats-mines">Mines: {this.state.mines}</span>
-          <span className="stats-uncovered">Uncovered: {this.state.uncovered}</span>
+          <span className="stats-mines">💣: {this.state.mines}</span>
+          <span className="stats-flags">🚩: {this.state.flags}</span>
         </div>
         {this.renderRow(0)}
         {this.renderRow(1)}
@@ -143,12 +186,26 @@ class Board extends React.Component {
         {this.renderRow(7)}
         {this.renderRow(8)}
         {this.renderRow(9)}
+        {this.renderRow(10)}
+        {this.renderRow(11)}
+        {this.renderRow(12)}
+        {this.renderRow(13)}
+        {this.renderRow(14)}
+        {this.renderRow(15)}
+        {this.renderRow(16)}
+        {this.renderRow(17)}
       <Button
         className="btn-reset"
         variant="outlined"
         color="secondary"
         disableElevation
         onClick={() => this.resetBoard()}>Reset</Button>
+      <Button
+        className="btn-show"
+        variant="outlined"
+        color="primary"
+        disableElevation
+        onClick={() => this.showBoard()}>Show</Button>
       </div>
     )
   }
@@ -168,15 +225,21 @@ class Cell extends React.Component {
     this.setState({value: this.props.value, hidden: true, class: "cell cell-hide"});
   }
 
-  cellClick(x,y, leftClick) {
+  cellClick(leftClick, d) {
     // Ignore click event if already uncovered.
     if (!this.state.hidden) { return; }
 
     // Right-click.
     if (!leftClick) {
-      console.log(this.state.value);
       this.setState(prev => {
-        prev.value = (prev.value === "🚩") ? 0 : "🚩";
+        if (prev.value === "🚩") {
+          prev.value = 0;
+          this.props.removeFlag();
+        }
+        else {
+          prev.value = "🚩";
+          this.props.addFlag();
+        }
         return prev;
       });
       return;
@@ -187,9 +250,17 @@ class Cell extends React.Component {
     // Alert board that a cell has been uncovered.
     this.props.uncover();
 
+    // If flagged.
+    if (this.state.value === "🚩") {
+      this.props.removeFlag();
+    }
+
     // Mine cell.
-    if (this.props.board[y][x] === 1) {
+    if (this.props.board[this.props.y][this.props.x] === 1) {
       this.setState({value: "💣"});
+      if (d === 0) {
+        this.props.showBoard();
+      }
       return;
     }
 
@@ -199,7 +270,7 @@ class Cell extends React.Component {
       for (let j = -1; j <= 1; j++) {
         let cellValue;
         try {
-          cellValue = this.props.board[y+j][x+i] || 0;
+          cellValue = this.props.board[this.props.y + j][this.props.x + i] || 0;
         }
         catch (err) {
           cellValue = 0;
@@ -220,8 +291,8 @@ class Cell extends React.Component {
     return (
       <button
         className={this.state.class}
-        onClick={() => this.cellClick(this.props.x, this.props.y, true)}
-        onContextMenu={(e) => {this.cellClick(this.props.x, this.props.y, false); e.preventDefault()}}
+        onClick={() => this.cellClick(true, 0)}
+        onContextMenu={(e) => {this.cellClick(false); e.preventDefault()}}
       >
         {this.state.value}
       </button>
