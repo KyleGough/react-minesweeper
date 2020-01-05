@@ -1,14 +1,11 @@
 import React from 'react';
-//import ReactDOM from 'react-dom';
 import './App.css';
 import { Button } from '@material-ui/core';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
 
 // TODO LIST.
-// Custom board sizes.
 // Difficulty.
-// Flood fill.
 // First move.
 // Win detection.
 
@@ -25,7 +22,7 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
 
-    const p = 0.2;
+    const p = 0.1;
     const w = 18;
     const h = 18;
     const board = this.newBoard(p, w, h);
@@ -88,7 +85,7 @@ class Board extends React.Component {
   }
 
   resetBoard() {
-    const board = this.newBoard(0.2, this.state.width, this.state.height);
+    const board = this.newBoard(0.1, this.state.width, this.state.height);
     const mines = this.countMines(board, this.state.width, this.state.height);
     this.setState({board: board, mines: mines, uncovered: 0, show: false});
     for (let i = 0; i < this.state.width; i++) {
@@ -109,17 +106,62 @@ class Board extends React.Component {
     }
   }
 
+  floodFill(x, y) {
+    let cellList = [];
+    let stack = [];
+    cellList.push([x,y]);
+    stack.push([x,y]);
+
+    while (stack.length > 0) {
+      let cell = stack.pop();
+      x = cell[0];
+      y = cell[1];
+
+      if (y - 1 >= 0 && !this.inList(cellList, [x,y-1])) {
+        if (this.refBoard[y-1][x].current.cellClick(true, 1) === 0) {
+          stack.push([x,y-1]);
+          cellList.push([x,y-1]);
+        }
+      }
+      if (y + 1 < this.state.height && !this.inList(cellList, [x,y+1])) {
+        if (this.refBoard[y+1][x].current.cellClick(true, 1) === 0) {
+          stack.push([x,y+1]);
+          cellList.push([x,y+1]);
+        }
+      }
+      if (x - 1 >= 0 && !this.inList(cellList, [x-1,y])) {
+        if (this.refBoard[y][x-1].current.cellClick(true, 1) === 0) {
+          stack.push([x-1,y]);
+          cellList.push([x-1,y]);
+        }
+      }
+      if (x + 1 < this.state.width && !this.inList(cellList, [x+1,y])) {
+        if (this.refBoard[y][x+1].current.cellClick(true, 1) === 0) {
+          stack.push([x+1,y]);
+          cellList.push([x+1,y]);
+        }
+      }
+    }
+  }
+
+  inList(list, tuple) {
+    for (let i = 0; i < list.length; i++) {
+      if (tuple[0] === list[i][0] && tuple[1] === list[i][1]) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   uncoverCell() {
     this.setState(prev => ({uncovered: prev.uncovered + 1}));
   }
 
   addFlag() {
-    console.log("add");
     this.setState(prev => ({flags: prev.flags + 1}));
   }
 
   removeFlag() {
-    console.log("remove");
     this.setState(prev => ({flags: prev.flags - 1}));
   }
 
@@ -136,6 +178,7 @@ class Board extends React.Component {
         showBoard={this.showBoard.bind(this)}
         addFlag={this.addFlag.bind(this)}
         removeFlag={this.removeFlag.bind(this)}
+        floodFill={this.floodFill.bind(this)}
       />
     );
   }
@@ -281,9 +324,14 @@ class Cell extends React.Component {
       }
     }
 
+    if (d === 0 && adjacentMines === 0) {
+      this.props.floodFill(this.props.x, this.props.y);
+    }
+
     const className = "cell cell-show cell-" + adjacentMines;
     this.setState({value: adjacentMines});
     this.setState({class: className});
+    return adjacentMines;
   }
 
   // Cell rendering.
