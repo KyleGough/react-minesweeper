@@ -3,11 +3,16 @@ import './App.css';
 import { Button } from '@material-ui/core';
 import 'materialize-css';
 import 'materialize-css/dist/css/materialize.min.css';
+import Snackbar from '@material-ui/core/Snackbar';
+import IconButton from '@material-ui/core/IconButton';
+import CloseIcon from '@material-ui/icons/Close';
 
 // TODO LIST.
 // Difficulty.
 // First move.
 // Win detection.
+// FLAGGED counter error on flood fill.
+// on uncover use w, h, uncovered to determine if complete.
 
 function App() {
   return (
@@ -17,7 +22,7 @@ function App() {
         <p className="header header-subtitle">First project using React.</p>
         <small className="header-instructions">Use LEFT CLICK to reveal tiles.</small>
         <small className="header-instructions">Use RIGHT CLICK to flag tiles.</small>
-        <p className="header header-link"><a href="https://github.com/KyleGough/react-minesweeper" target="_blank">See this project on Github</a></p>
+        <p className="header header-link"><a href="https://github.com/KyleGough/react-minesweeper" target="_blank" rel="noopener noreferrer">See this project on Github</a></p>
       </header>
       <Board />
     </div>
@@ -52,6 +57,7 @@ class Board extends React.Component {
       flags: 0,
       uncovered: 0,
       show: false,
+      popGameOver: false,
     }
   }
 
@@ -103,7 +109,7 @@ class Board extends React.Component {
 
   showBoard() {
     if (!this.state.show) {
-      this.setState({show: true});
+      this.setState({show: true, popGameOver: true});
       for (let i = 0; i < this.state.width; i++) {
         for (let j = 0; j < this.state.height; j++) {
           this.refBoard[j][i].current.cellClick(true);
@@ -253,6 +259,40 @@ class Board extends React.Component {
   }
     
 
+  gameLoseClick() {
+    this.setState({popGameOver: true})
+  }
+
+  gameLoseClose(event, reason) {
+    if (reason === 'clickaway') {
+      return;
+    }
+    this.setState({popGameOver: false})
+  };
+
+  renderLoseSnackbar() {
+    return (
+      <Snackbar
+          anchorOrigin={{vertical: 'bottom', horizontal: 'center'}}
+          open={this.state.popGameOver}
+          autoHideDuration={5000}
+          onClose={this.gameLoseClose.bind(this)}
+          ContentProps={{'aria-describedby': 'message-id'}}
+          message={<span id="snackbar-game-lose">GAME OVER!</span>}
+          action={[
+            <IconButton
+              key="close"
+              aria-label="close"
+              color="inherit"
+              onClick={this.gameLoseClose.bind(this)}
+            >
+              <CloseIcon />
+            </IconButton>,
+          ]}
+        />
+    );
+  }
+
   render() {
     
     return (
@@ -263,15 +303,17 @@ class Board extends React.Component {
           variant="outlined"
           color="secondary"
           disableElevation
-          onClick={() => this.resetBoard()}>Reset</Button>
+          onClick={() => this.resetBoard()}>Reset
+        </Button>
         <Button
           className="btn-show"
           variant="outlined"
           color="primary"
           disableElevation
-          onClick={() => this.showBoard()}>Show</Button>
-          <span className="stats-mines">💣 {this.state.mines}</span>
-          <span className="stats-flags">🚩 {this.state.flags}</span>
+          onClick={() => this.showBoard()}>Show
+        </Button>
+          <span role="img" aria-label="bomb" className="stats-mines">💣 {this.state.mines}</span>
+          <span role="img" aria-label="flag" className="stats-flags">🚩 {this.state.flags}</span>
         </div>
         <div className="board">
           {this.renderRow(0)}
@@ -293,6 +335,7 @@ class Board extends React.Component {
           {this.renderRow(16)}
           {this.renderRow(17)}
         </div>
+        {this.renderLoseSnackbar()}
       </div>
     )
   }

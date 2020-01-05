@@ -117,3 +117,7 @@ code {
 .header-link {
   font-size: 39px;
 }
+
+#snackbar-game-lose {
+  text-align: center;
+}
