@@ -8,6 +8,8 @@ import 'materialize-css/dist/css/materialize.min.css';
 // Difficulty.
 // First move.
 // Win detection.
+// Text.
+// 8-directional floodfill.
 
 function App() {
   return (
@@ -117,30 +119,68 @@ class Board extends React.Component {
       x = cell[0];
       y = cell[1];
 
-      if (y - 1 >= 0 && !this.inList(cellList, [x,y-1])) {
+      let t = (y - 1 >= 0);
+      let b = (y + 1 < this.state.height);
+      let l = (x - 1 >= 0);
+      let r = (x + 1 < this.state.width);   
+
+      // Top.
+      if (t && !this.inList(cellList, [x,y-1])) {
         if (this.refBoard[y-1][x].current.cellClick(true, 1) === 0) {
           stack.push([x,y-1]);
           cellList.push([x,y-1]);
         }
       }
-      if (y + 1 < this.state.height && !this.inList(cellList, [x,y+1])) {
+      // Bottom.
+      if (b && !this.inList(cellList, [x,y+1])) {
         if (this.refBoard[y+1][x].current.cellClick(true, 1) === 0) {
           stack.push([x,y+1]);
           cellList.push([x,y+1]);
         }
       }
-      if (x - 1 >= 0 && !this.inList(cellList, [x-1,y])) {
+      // Left.
+      if (l && !this.inList(cellList, [x-1,y])) {
         if (this.refBoard[y][x-1].current.cellClick(true, 1) === 0) {
           stack.push([x-1,y]);
           cellList.push([x-1,y]);
         }
       }
-      if (x + 1 < this.state.width && !this.inList(cellList, [x+1,y])) {
+      // Right.
+      if (r && !this.inList(cellList, [x+1,y])) {
         if (this.refBoard[y][x+1].current.cellClick(true, 1) === 0) {
           stack.push([x+1,y]);
           cellList.push([x+1,y]);
         }
       }
+      // Top-Left.
+      if (t && l && !this.inList(cellList, [x-1,y-1])) {
+        if (this.refBoard[y-1][x-1].current.cellClick(true, 1) === 0) {
+          stack.push([x-1,y-1]);
+          cellList.push([x-1,y-1]);
+        }
+      }
+      // Top-Right.
+      if (t && r && !this.inList(cellList, [x+1,y-1])) {
+        if (this.refBoard[y-1][x+1].current.cellClick(true, 1) === 0) {
+          stack.push([x+1,y-1]);
+          cellList.push([x+1,y-1]);
+        }
+      }
+      // Bottom-Left.
+      if (b && l && !this.inList(cellList, [x-1,y+1])) {
+        if (this.refBoard[y+1][x-1].current.cellClick(true, 1) === 0) {
+          stack.push([x-1,y+1]);
+          cellList.push([x-1,y+1]);
+        }
+      }
+      // Bottom-Right.
+      if (b && r && !this.inList(cellList, [x+1,y+1])) {
+        if (this.refBoard[y+1][x+1].current.cellClick(true, 1) === 0) {
+          stack.push([x+1,y+1]);
+          cellList.push([x+1,y+1]);
+        }
+      }
+
     }
   }
 
