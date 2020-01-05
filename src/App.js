@@ -8,13 +8,17 @@ import 'materialize-css/dist/css/materialize.min.css';
 // Difficulty.
 // First move.
 // Win detection.
-// Text.
-// 8-directional floodfill.
 
 function App() {
   return (
     <div className="App">
-      <header className="App-header">React Minesweeper</header>
+      <header className="App-header">
+        <h1 className="header header-title">React - Minesweeper</h1>
+        <p className="header header-subtitle">First project using React.</p>
+        <small className="header-instructions">Use LEFT CLICK to reveal tiles.</small>
+        <small className="header-instructions">Use RIGHT CLICK to flag tiles.</small>
+        <p className="header header-link"><a href="https://github.com/KyleGough/react-minesweeper" target="_blank">See this project on Github</a></p>
+      </header>
       <Board />
     </div>
   );
@@ -89,7 +93,7 @@ class Board extends React.Component {
   resetBoard() {
     const board = this.newBoard(0.1, this.state.width, this.state.height);
     const mines = this.countMines(board, this.state.width, this.state.height);
-    this.setState({board: board, mines: mines, uncovered: 0, show: false});
+    this.setState({board: board, mines: mines, flags: 0, uncovered: 0, show: false});
     for (let i = 0; i < this.state.width; i++) {
       for (let j = 0; j < this.state.height; j++) {
         this.refBoard[j][i].current.hideCell();
@@ -250,45 +254,45 @@ class Board extends React.Component {
     
 
   render() {
-    const status = "React Minesweeper";
     
     return (
       <div>
-        <div className="status">{status}</div>
         <div className="stats">
-          <span className="stats-mines">💣: {this.state.mines}</span>
-          <span className="stats-flags">🚩: {this.state.flags}</span>
+          <Button
+          className="btn-reset"
+          variant="outlined"
+          color="secondary"
+          disableElevation
+          onClick={() => this.resetBoard()}>Reset</Button>
+        <Button
+          className="btn-show"
+          variant="outlined"
+          color="primary"
+          disableElevation
+          onClick={() => this.showBoard()}>Show</Button>
+          <span className="stats-mines">💣 {this.state.mines}</span>
+          <span className="stats-flags">🚩 {this.state.flags}</span>
         </div>
-        {this.renderRow(0)}
-        {this.renderRow(1)}
-        {this.renderRow(2)}
-        {this.renderRow(3)}
-        {this.renderRow(4)}
-        {this.renderRow(5)}
-        {this.renderRow(6)}
-        {this.renderRow(7)}
-        {this.renderRow(8)}
-        {this.renderRow(9)}
-        {this.renderRow(10)}
-        {this.renderRow(11)}
-        {this.renderRow(12)}
-        {this.renderRow(13)}
-        {this.renderRow(14)}
-        {this.renderRow(15)}
-        {this.renderRow(16)}
-        {this.renderRow(17)}
-      <Button
-        className="btn-reset"
-        variant="outlined"
-        color="secondary"
-        disableElevation
-        onClick={() => this.resetBoard()}>Reset</Button>
-      <Button
-        className="btn-show"
-        variant="outlined"
-        color="primary"
-        disableElevation
-        onClick={() => this.showBoard()}>Show</Button>
+        <div className="board">
+          {this.renderRow(0)}
+          {this.renderRow(1)}
+          {this.renderRow(2)}
+          {this.renderRow(3)}
+          {this.renderRow(4)}
+          {this.renderRow(5)}
+          {this.renderRow(6)}
+          {this.renderRow(7)}
+          {this.renderRow(8)}
+          {this.renderRow(9)}
+          {this.renderRow(10)}
+          {this.renderRow(11)}
+          {this.renderRow(12)}
+          {this.renderRow(13)}
+          {this.renderRow(14)}
+          {this.renderRow(15)}
+          {this.renderRow(16)}
+          {this.renderRow(17)}
+        </div>
       </div>
     )
   }
