@@ -7,13 +7,12 @@ import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
 
-// TODO LIST.
-// Difficulty.
-// First move.
-// Win detection.
-// FLAGGED counter error on flood fill.
-// on uncover use w, h, uncovered to determine if complete.
+// [TODO].
+// FEATURE: Win detection.
+// BUG:     Flagged counter error on flood fill.
 
+
+// App header.
 function App() {
   return (
     <div className="App">
@@ -33,7 +32,7 @@ class Board extends React.Component {
   constructor(props) {
     super(props);
 
-    const p = 0.1;
+    const p = 0.15;
     const w = 18;
     const h = 18;
     const board = this.newBoard(p, w, h);
@@ -61,18 +60,6 @@ class Board extends React.Component {
     }
   }
 
-  getRefBoard(w, h) {
-    let refBoard = []
-    for (let j = 0; j < h; j++) {
-      let row = [];
-      for (let i = 0; i < w; i++) {
-        row[i] = React.createRef();
-      }
-      refBoard[j] = row;
-    }
-    return refBoard;
-  }
-
   // Board Initialisation.
   newBoard(p, w, h) {
     let board = [];
@@ -86,6 +73,7 @@ class Board extends React.Component {
     return board;
   }
 
+  // Counts the number of mines in the board.
   countMines(board, w, h) {
     let count = 0
     for (let i = 0; i < w; i++) {
@@ -96,8 +84,9 @@ class Board extends React.Component {
     return count;
   }
 
+  // Resets the board. Hides every cell.
   resetBoard() {
-    const board = this.newBoard(0.1, this.state.width, this.state.height);
+    const board = this.newBoard(0.15, this.state.width, this.state.height);
     const mines = this.countMines(board, this.state.width, this.state.height);
     this.setState({board: board, mines: mines, flags: 0, uncovered: 0, show: false});
     for (let i = 0; i < this.state.width; i++) {
@@ -107,6 +96,7 @@ class Board extends React.Component {
     }
   }
 
+  // Reveals the board.
   showBoard() {
     if (!this.state.show) {
       this.setState({show: true, popGameOver: true});
@@ -118,11 +108,22 @@ class Board extends React.Component {
     }
   }
 
+  // Perform flood-fill at a given cell (x,y).
   floodFill(x, y) {
     let cellList = [];
     let stack = [];
     cellList.push([x,y]);
     stack.push([x,y]);
+
+    // Check if a cell is in a list.
+    const inList = (list, tuple) => {
+      for (let i = 0; i < list.length; i++) {
+        if (tuple[0] === list[i][0] && tuple[1] === list[i][1]) {
+          return true;
+        }
+      }
+      return false;
+    };
 
     while (stack.length > 0) {
       let cell = stack.pop();
@@ -135,56 +136,56 @@ class Board extends React.Component {
       let r = (x + 1 < this.state.width);   
 
       // Top.
-      if (t && !this.inList(cellList, [x,y-1])) {
+      if (t && !inList(cellList, [x,y-1])) {
         if (this.refBoard[y-1][x].current.cellClick(true, 1) === 0) {
           stack.push([x,y-1]);
           cellList.push([x,y-1]);
         }
       }
       // Bottom.
-      if (b && !this.inList(cellList, [x,y+1])) {
+      if (b && !inList(cellList, [x,y+1])) {
         if (this.refBoard[y+1][x].current.cellClick(true, 1) === 0) {
           stack.push([x,y+1]);
           cellList.push([x,y+1]);
         }
       }
       // Left.
-      if (l && !this.inList(cellList, [x-1,y])) {
+      if (l && !inList(cellList, [x-1,y])) {
         if (this.refBoard[y][x-1].current.cellClick(true, 1) === 0) {
           stack.push([x-1,y]);
           cellList.push([x-1,y]);
         }
       }
       // Right.
-      if (r && !this.inList(cellList, [x+1,y])) {
+      if (r && !inList(cellList, [x+1,y])) {
         if (this.refBoard[y][x+1].current.cellClick(true, 1) === 0) {
           stack.push([x+1,y]);
           cellList.push([x+1,y]);
         }
       }
       // Top-Left.
-      if (t && l && !this.inList(cellList, [x-1,y-1])) {
+      if (t && l && !inList(cellList, [x-1,y-1])) {
         if (this.refBoard[y-1][x-1].current.cellClick(true, 1) === 0) {
           stack.push([x-1,y-1]);
           cellList.push([x-1,y-1]);
         }
       }
       // Top-Right.
-      if (t && r && !this.inList(cellList, [x+1,y-1])) {
+      if (t && r && !inList(cellList, [x+1,y-1])) {
         if (this.refBoard[y-1][x+1].current.cellClick(true, 1) === 0) {
           stack.push([x+1,y-1]);
           cellList.push([x+1,y-1]);
         }
       }
       // Bottom-Left.
-      if (b && l && !this.inList(cellList, [x-1,y+1])) {
+      if (b && l && !inList(cellList, [x-1,y+1])) {
         if (this.refBoard[y+1][x-1].current.cellClick(true, 1) === 0) {
           stack.push([x-1,y+1]);
           cellList.push([x-1,y+1]);
         }
       }
       // Bottom-Right.
-      if (b && r && !this.inList(cellList, [x+1,y+1])) {
+      if (b && r && !inList(cellList, [x+1,y+1])) {
         if (this.refBoard[y+1][x+1].current.cellClick(true, 1) === 0) {
           stack.push([x+1,y+1]);
           cellList.push([x+1,y+1]);
@@ -194,27 +195,22 @@ class Board extends React.Component {
     }
   }
 
-  inList(list, tuple) {
-    for (let i = 0; i < list.length; i++) {
-      if (tuple[0] === list[i][0] && tuple[1] === list[i][1]) {
-        return true;
-      }
-    }
-    return false;
-  }
-
+  // Increments uncovered cell count.
   uncoverCell() {
     this.setState(prev => ({uncovered: prev.uncovered + 1}));
   }
 
+  // Increments flag state.
   addFlag() {
     this.setState(prev => ({flags: prev.flags + 1}));
   }
 
+  // Decrements flag state.
   removeFlag() {
     this.setState(prev => ({flags: prev.flags - 1}));
   }
 
+  // Renders a cell.
   renderCell(i, y, x) {
     return (
       <Cell
@@ -233,6 +229,7 @@ class Board extends React.Component {
     );
   }
 
+  // Renders a row of cells.
   renderRow(j) {  
     return (
       <div className="board-row">
@@ -258,18 +255,20 @@ class Board extends React.Component {
     )
   }
     
-
+  // Displays the lose game snackbar.
   gameLoseClick() {
     this.setState({popGameOver: true})
   }
 
-  gameLoseClose(event, reason) {
+  // Closes the lose game snackbar.
+  gameLoseClose(_, reason) {
     if (reason === 'clickaway') {
       return;
     }
     this.setState({popGameOver: false})
   };
 
+  // Renders the lose game snackbar.
   renderLoseSnackbar() {
     return (
       <Snackbar
@@ -293,8 +292,8 @@ class Board extends React.Component {
     );
   }
 
+  // Renders the board.
   render() {
-    
     return (
       <div>
         <div className="stats">
@@ -351,10 +350,12 @@ class Cell extends React.Component {
     }
   }
 
+  // Hides the cell.
   hideCell() {
     this.setState({value: this.props.value, hidden: true, class: "cell cell-hide"});
   }
 
+  // Reveals the cell.
   cellClick(leftClick, d) {
     // Ignore click event if already uncovered.
     if (!this.state.hidden) { return; }
@@ -421,7 +422,7 @@ class Cell extends React.Component {
     return adjacentMines;
   }
 
-  // Cell rendering.
+  // Renders the cell.
   render() {
     return (
       <button
