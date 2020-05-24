@@ -1,8 +1,6 @@
 import React from 'react';
 import './App.css';
 import { Button } from '@material-ui/core';
-import 'materialize-css';
-import 'materialize-css/dist/css/materialize.min.css';
 import Snackbar from '@material-ui/core/Snackbar';
 import IconButton from '@material-ui/core/IconButton';
 import CloseIcon from '@material-ui/icons/Close';
