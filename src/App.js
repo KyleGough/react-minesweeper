@@ -31,7 +31,7 @@ class Board extends React.Component {
     super(props);
 
     const p = 0.15;
-    const w = 18;
+    const w = 36;
     const h = 18;
     const board = this.newBoard(p, w, h);
     const mines = this.countMines(board, w,h);
@@ -249,6 +249,24 @@ class Board extends React.Component {
         {this.renderCell(this.state.board[j][15], j, 15)}
         {this.renderCell(this.state.board[j][16], j, 16)}
         {this.renderCell(this.state.board[j][17], j, 17)}
+        {this.renderCell(this.state.board[j][18], j, 18)}
+        {this.renderCell(this.state.board[j][19], j, 19)}
+        {this.renderCell(this.state.board[j][20], j, 20)}
+        {this.renderCell(this.state.board[j][21], j, 21)}
+        {this.renderCell(this.state.board[j][22], j, 22)}
+        {this.renderCell(this.state.board[j][23], j, 23)}
+        {this.renderCell(this.state.board[j][24], j, 24)}
+        {this.renderCell(this.state.board[j][25], j, 25)}
+        {this.renderCell(this.state.board[j][26], j, 26)}
+        {this.renderCell(this.state.board[j][27], j, 27)}
+        {this.renderCell(this.state.board[j][28], j, 28)}
+        {this.renderCell(this.state.board[j][29], j, 29)}
+        {this.renderCell(this.state.board[j][30], j, 30)}
+        {this.renderCell(this.state.board[j][31], j, 31)}
+        {this.renderCell(this.state.board[j][32], j, 32)}
+        {this.renderCell(this.state.board[j][33], j, 33)}
+        {this.renderCell(this.state.board[j][34], j, 34)}
+        {this.renderCell(this.state.board[j][35], j, 35)}
       </div>
     )
   }
